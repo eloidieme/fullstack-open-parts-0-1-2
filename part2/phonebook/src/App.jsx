@@ -6,13 +6,28 @@ const App = () => {
   ])
   const [newName, setNewName] = useState('')
 
+  const isAllowed = (pers, candidateName) => {
+    for (let i = 0; i < pers.length; i++) {
+      if (pers[i].name === candidateName) {
+        return false
+      }
+    }
+    return true
+  }
+
   const addPerson = (event) => {
     event.preventDefault()
     const newPerson = {
       name : newName
     }
 
-    setPersons(persons.concat(newPerson))
+    if (isAllowed(persons, newPerson.name)) {
+      setPersons(persons.concat(newPerson))
+    } 
+    else {
+      alert(`${newName} is already added to phonebook`)
+    }
+
     setNewName('')
   }
 
