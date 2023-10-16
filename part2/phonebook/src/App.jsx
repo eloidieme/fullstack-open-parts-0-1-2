@@ -30,7 +30,7 @@ const PersonForm = ( {handleSubmit, newName, handleNameChange, newNumber, handle
 }
 
 const Person = ( {person, handleDelete} ) => {
-  return (<div >{person.name} {person.number} <DeletePerson person = {person} handleDelete={handleDelete} /></div>)
+  return (<div>{person.name} {person.number} <DeletePerson person = {person} handleDelete={handleDelete} /></div>)
 }
 
 const Persons = ( {personList, handleDelete} ) => {
@@ -43,11 +43,22 @@ const DeletePerson = ( {person, handleDelete} ) => {
   return (<button onClick={handleDelete(person)}>delete</button>)
 }
 
+const Notification = ( {message} ) => {
+  if (message === null) {
+    return null
+  } 
+
+  return (
+    <div className='notification'>{message}</div>
+  )
+}
+
 const App = () => {
   const [persons, setPersons] = useState([])
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [filterName, setFilterName] = useState('')
+  const [notificationMessage, setNotification] = useState(null)
 
   useEffect(() => {
     personServices
@@ -84,13 +95,21 @@ const App = () => {
       const idUpdate = idToUpdate(persons, newPerson.name, newPerson.number)
       if (idUpdate < 0) {
         personServices.addOne(newPerson)
-        .then(data => setPersons(persons.concat(data)))
+        .then(data => {
+          setPersons(persons.concat(data))
+          setNotification(`${data.name} has been added`)
+          setTimeout(() => setNotification(null), 5000)
+        })
       }
       else {
        if (window.confirm(`${newPerson.name} is already added to phonebook, replace the old number with a new one ?`)) {
         personServices
         .updateNumber(newPerson, idUpdate)
-        .then(returnedPerson => setPersons(persons.map(p => p.id !== idUpdate ? p : returnedPerson)))
+        .then(returnedPerson => {
+          setPersons(persons.map(p => p.id !== idUpdate ? p : returnedPerson))
+          setNotification(`${returnedPerson.name}'s number has been changed`)
+          setTimeout(() => setNotification(null), 5000)
+        })
         .catch(error => alert("error"))
        }
       }
@@ -126,10 +145,12 @@ const App = () => {
 
   const personsToShow = persons.filter(person => person.name.toLowerCase().includes(filterName.toLowerCase()))
 
-  
+
   return (
     <div>
       <h2>Phonebook</h2>
+
+      <Notification message={notificationMessage} />
 
       <Filter filterName={filterName} handleFilter={handleFilter}/>
 
