@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import axios from 'axios'
 
 import personServices from './services/persons' 
@@ -53,12 +53,23 @@ const Notification = ( {message} ) => {
   )
 }
 
+const Error = ( {message} ) => {
+  if (message === null) {
+    return null
+  } 
+
+  return (
+    <div className='error'>{message}</div>
+  )
+}
+
 const App = () => {
   const [persons, setPersons] = useState([])
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [filterName, setFilterName] = useState('')
   const [notificationMessage, setNotification] = useState(null)
+  const [errorMessage, setErrorMessage] = useState(null)
 
   useEffect(() => {
     personServices
@@ -110,7 +121,10 @@ const App = () => {
           setNotification(`${returnedPerson.name}'s number has been changed`)
           setTimeout(() => setNotification(null), 5000)
         })
-        .catch(error => alert("error"))
+        .catch(error => {
+          setErrorMessage(`Information on ${newName} has already been removed from server`)
+          setTimeout(() => setErrorMessage(null), 5000)
+        })
        }
       }
     } 
@@ -150,7 +164,8 @@ const App = () => {
     <div>
       <h2>Phonebook</h2>
 
-      <Notification message={notificationMessage} />
+      <Notification message={notificationMessage}/>
+      <Error message={errorMessage} />
 
       <Filter filterName={filterName} handleFilter={handleFilter}/>
 
