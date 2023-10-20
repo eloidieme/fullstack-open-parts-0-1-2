@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react'
 import axios from 'axios'
 
-const Countries = ( {countriesList} ) => {
+const Countries = ( {countriesList, handleButton} ) => {
   if (countriesList.length > 0) {
-    return (<ul>{countriesList.map(country => <li key={country.name.official}>{country.name.common}</li>)}</ul>)
+    return (<ul>{countriesList.map(country => <li key={country.name.official}>{country.name.common} <button onClick={handleButton(country.name.common)}>show</button></li>)}</ul>)
   }
 }
 
@@ -38,10 +38,14 @@ const App = () => {
     if (list.length == 1) {
       return (<Country country = {list[0]} />)
     } else if (list.length <= 10) {
-      return (<Countries countriesList={list} />) 
+      return (<Countries countriesList={list} handleButton={handleShowCountry} />) 
     } else {
       return (<p>Too many matches, specify another filter</p>)
     }
+  }
+
+  const handleShowCountry = (countryName) => () => {
+    setValue(countryName)
   }
 
   useEffect(() => {
